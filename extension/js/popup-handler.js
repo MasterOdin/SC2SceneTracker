@@ -1,22 +1,4 @@
-TwitchSC2Streams
-================
-
-Extension Name: SC2 Stream Tracker  
-
-Chrome extension that gives a nice pop-up with all current SC2:HotS streams with  
-viewer count, etc. It'll pull all stream data from Twitch with maybe a thing on   
-if GSL is streaming but that's a stretch goal and definitely not a priority.
-
-Major issue with the very few extensions that exist is that they're primarily  
-focused around the TeamLiquid stream list (which while good, doesn't have all  
-available streams on it) or only work for Starcraft 2: Wings of Liberty, which  
-has been abandoned for Starcraft 2: Heart of the Swarm. This project is for my  
-desire to have something that is akin to [d2mt](https://github.com/wololodev/d2mt)  
-except for SC2. At the very least, it should offer a nice list of streams on twitch.
-
-
-License
-----------
+/*
 Copyright (c) 2014 Matthew "Master_Odin" Peveler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -35,3 +17,31 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+function getStreamList() {
+    jQuery.getJSON('https://api.twitch.tv/kraken/streams',
+        { 
+            game: "StarCraft II: Heart of the Swarm", 
+            limit: 15 
+        },
+        function(data) {
+            var items = [];
+            jQuery.each(data.streams,function(key,value) {
+                var url = value['channel']['url'];
+                var alt = value['channel']['status'];
+                var name = value['channel']['display_name'];
+                jQuery('div#streams_list').append('<div><a class="stream" href="'+url+'" alt="'+alt+'">'+name+'</a>');
+            });
+            jQuery('a.stream').click(function() {
+                chrome.tabs.create({url: jQuery(this).attr('href')});
+                return false;
+            });            
+        }
+    );
+
+}
+ 
+document.addEventListener('DOMContentLoaded', function() {
+    getStreamList(); 
+});
