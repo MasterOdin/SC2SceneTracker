@@ -7,6 +7,16 @@ body {
     padding: 4px; 
 }
 
+#twitch-tab {
+    vertical-align: center;
+    margin-bottom: 5px;
+}
+
+.tab-text {
+    margin-top: -22px;
+    margin-left: 28px;
+}
+
 a {
     text-decoration: none;
     margin-bottom: 2px;
@@ -42,7 +52,7 @@ td.logo {
     vertical-align: bottom;
 }
 
-img.stream_logo {
+img.stream-logo {
     width: 100%;
     height: 100%;
     vertical-align: bottom;

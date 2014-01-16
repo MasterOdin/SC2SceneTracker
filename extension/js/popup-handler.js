@@ -31,25 +31,25 @@ function getStreamList() {
         function(data) {
             var items = [];
             jQuery.each(data.streams,function(key,value) {
-                var url = value['channel']['url'];
+                var url = value['channel']['url']+"/popout";
                 var alt = value['channel']['status'];
                 var name = value['channel']['display_name'];
                 var viewers = value['viewers'];
 
                 var logo = (value['channel']['logo'] == null) ? '../images/no_logo-70x70.jpeg' : value['channel']['logo'].replace("300x300","70x70");
-                jQuery('table#streams').append('<tr class="stream_row" title="'+alt+'">'+
-                    '<td class="logo"><a class="stream" href="'+url+'" alt="'+alt+'"><img class="stream_logo" src="'+logo+'" /></a></td>'+
+                jQuery('table#streams').append('<tr class="stream-row" title="'+alt+'">'+
+                    '<td class="logo"><a class="stream" href="'+url+'" alt="'+alt+'"><img class="stream-logo" src="'+logo+'" /></a></td>'+
                     '<td class="name">'+name+'</a></td>'+
                     '<td class="viewers">'+viewers+'</td></tr>');
             });
 
-            jQuery('tr.stream_row').click(function() {
+            jQuery('tr.stream-row').click(function() {
                 chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
                 window.close();
                 return false;
             });
 
-            jQuery('tr.stream_row').each(function() {
+            jQuery('tr.stream-row').each(function() {
                 var top = jQuery(this).position().top;
                 var my = "center bottom";
                 var at = "center top-7";
