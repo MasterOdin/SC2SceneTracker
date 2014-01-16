@@ -33,15 +33,23 @@ function getStreamList() {
                 var name = value['channel']['display_name'];
                 var viewers = value['viewers'];
                 var logo = value['channel']['logo'].replace("300x300","70x70");
-                jQuery('table#streams').append('<tr><td class="logo"><img class="stream_logo" src="'+logo+'" /></td>'+
-                    '<td class="name"><a class="stream" href="'+url+'" alt="'+alt+'">'+name+'</a></td>'+
+                jQuery('table#streams').append('<tr class="stream_row">'+
+                    '<td class="logo"><a class="stream" href="'+url+'" alt="'+alt+'"><img class="stream_logo" src="'+logo+'" /></a></td>'+
+                    '<td class="name">'+name+'</a></td>'+
                     '<td class="viewers">'+viewers+'</td></tr>');
             });
+/*
             jQuery('a.stream').click(function() {
                 chrome.tabs.create({url: jQuery(this).attr('href')});
                 window.close();
                 return false;
-            });            
+            });
+*/
+            jQuery('tr.stream_row').click(function() {
+                chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
+                window.close();
+                return false;
+            });
         }
     );
 
