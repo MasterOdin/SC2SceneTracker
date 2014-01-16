@@ -31,10 +31,15 @@ function getStreamList() {
                 var url = value['channel']['url'];
                 var alt = value['channel']['status'];
                 var name = value['channel']['display_name'];
-                jQuery('div#streams_list').append('<div><a class="stream" href="'+url+'" alt="'+alt+'">'+name+'</a>');
+                var viewers = value['viewers'];
+                var logo = value['channel']['logo'].replace("300x300","70x70");
+                jQuery('table#streams').append('<tr><td class="logo"><img class="stream_logo" src="'+logo+'" /></td>'+
+                    '<td class="name"><a class="stream" href="'+url+'" alt="'+alt+'">'+name+'</a></td>'+
+                    '<td class="viewers">'+viewers+'</td></tr>');
             });
             jQuery('a.stream').click(function() {
                 chrome.tabs.create({url: jQuery(this).attr('href')});
+                window.close();
                 return false;
             });            
         }

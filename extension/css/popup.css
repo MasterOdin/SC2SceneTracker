@@ -13,26 +13,38 @@ a {
     color: #333333;
 }
 
-#forums-list {
-    width: 100%;
-    margin: 0px;
-    overflow-x: hidden;
+img.stream_logo {
+    width: 16px;
 }
 
-.header-link {
-    background-color: #069;
-    min-width: 100%;
-    padding: 2px;
+table {
+    border: 0px;
+    cellspacing: 0px;
+    border-collapse: collapse;
+}
+
+th.tname {
+    width: 70%;
+}
+
+th.tviewers {
+    width: 30%;
+}
+
+td.logo,
+td.viewers {
     text-align: center;
-    margin-bottom: 5px;
-    width: 100px;
+    width: 30px;
 }
 
-.header-link a {
-    color: #fff;
+td.name {
+    width: 200px;
 }
 
-.forum-link {
-    padding-top: 2px;
-    padding-bottom: 2px;
+td.viewers {
+    width: 70px;
+}
+
+tr:hover {
+    background-color: #ffefcf !important;
 }
