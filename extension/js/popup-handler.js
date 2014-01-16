@@ -19,6 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/*
+ * Relates to https://github.com/justintv/Twitch-API/blob/master/v2_resources/streams.md
+ */
 function getStreamList() {
     jQuery.getJSON('https://api.twitch.tv/kraken/streams',
         { 
@@ -32,23 +35,28 @@ function getStreamList() {
                 var alt = value['channel']['status'];
                 var name = value['channel']['display_name'];
                 var viewers = value['viewers'];
-                var logo = value['channel']['logo'].replace("300x300","70x70");
-                jQuery('table#streams').append('<tr class="stream_row">'+
+
+                var logo = (value['channel']['logo'] == null) ? '../images/no_logo-70x70.jpeg' : value['channel']['logo'].replace("300x300","70x70");
+                jQuery('table#streams').append('<tr class="stream_row" title="'+alt+'">'+
                     '<td class="logo"><a class="stream" href="'+url+'" alt="'+alt+'"><img class="stream_logo" src="'+logo+'" /></a></td>'+
                     '<td class="name">'+name+'</a></td>'+
                     '<td class="viewers">'+viewers+'</td></tr>');
             });
-/*
-            jQuery('a.stream').click(function() {
-                chrome.tabs.create({url: jQuery(this).attr('href')});
-                window.close();
-                return false;
-            });
-*/
+            
             jQuery('tr.stream_row').click(function() {
                 chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
                 window.close();
                 return false;
+            });
+
+            jQuery('tr.stream_row').tooltip({
+                html:true,
+                position: {
+                    my: "top+20",
+                    at: "center"
+                },
+                
+                tooltipClass: 'tooltip'
             });
         }
     );

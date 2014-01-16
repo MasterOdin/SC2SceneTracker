@@ -3,8 +3,8 @@ body {
     font-size: 10pt;
     overflow-x: hidden;
     margin: 0px;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    padding: 4px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding: 4px; 
 }
 
 a {
@@ -31,10 +31,10 @@ th.tviewers {
     width: 30%;
 }
 
-td.logo,
-td.viewers {
+td.logo {
     text-align: center;
     width: 16px;
+    background-color: #ededed;
 }
 
 td.name {
@@ -46,6 +46,7 @@ td.name {
 }
 
 td.viewers {
+    text-align: center;
     width: 70px;
     background-color: #DDDDDD;
 }
@@ -59,4 +60,15 @@ tr:hover td {
     background-color: #3A355E !important;
     color: #fff !important;
     cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  display: block;
+  z-index: 1000;
+  font-size: 11px;
+  line-height: 1.4;
+  background-color: #000;
+  color: #FFF;
+  padding: 5px;
 }

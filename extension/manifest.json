@@ -1,6 +1,6 @@
 {
   "name": "SC2 Stream Tracker",
-  "version": "0.0.0.3",
+  "version": "0.0.0.4",
   "manifest_version": 2,
   "description": "Keeping track of twitch SC2 streams for you!",
   "icons": {
