@@ -77,7 +77,17 @@ function getStreamList() {
     );
 
 }
+
+function tabs() {
+    jQuery( ".tab" ).click( function () {
+        jQuery('#content-'+jQuery( ".selected" ).attr('id')).css('display','none');
+        jQuery(".selected").removeClass( "selected" );
+        jQuery( this ).addClass( "selected" );
+        jQuery("#content-"+jQuery(this).attr('id')).css('display','block');
+    });
+}
  
 document.addEventListener('DOMContentLoaded', function() {
-    getStreamList(); 
+    getStreamList();
+    tabs();
 });

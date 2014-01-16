@@ -7,8 +7,12 @@
 <link rel="stylesheet" type="text/css" href="css/popup.css" />
 </head>
 <body>
-<div id="streams_list">
-    <div id="twitch-tab"><img width="24px" src='images/twitch_logo.png' /><div class="tab-text">Streams</div></div>
+<ul id="tabs">
+    <li id='twitch' class="tab selected"><img width="24px" src='images/twitch_logo.png' /> Watch</li>
+    <li id='liquid' class="tab"><img width="20px" src='images/team_liquid.png' /> News</li>    
+    <li id='settings' class="tab"><img width="16px" src="images/settings_cog.png" /> Settings</li>
+</ul>
+<div id="content-twitch">
     <table id="streams">
         <tr>
             <th colspan='2' class='tname'>Streamer</th>

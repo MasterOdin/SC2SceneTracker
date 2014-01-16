@@ -91,7 +91,6 @@ tr:hover td {
   line-height: 1.4;
   background-color: #000;
   color: #FFF;
-  width: 75%;
   text-align: center;
 }
 
@@ -120,4 +119,54 @@ tr:hover td {
     left: 50%;
     border-color: #000 transparent;
     border-width: 0 5px 5px;
+}
+
+#tabs {
+    border-bottom: 1px solid #666666;
+    font: bold 12px/12px Helvetica, Tahoma, Arial;
+    height: 30px;  
+    margin: 0;
+    padding: 0; 
+    padding-left: 10px; 
+}
+
+.tab {
+    color: #777;
+    cursor: pointer;
+    display: inline-block; 
+    height: 23px; 
+    font-size: 12px;
+    line-height: 13px;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding-top: 8px;
+    text-align: center;
+    vertical-align: top;
+    width: 80px; 
+}
+
+.tab:hover {
+    border: 1px solid #666666;
+    border-bottom: 1px solid white;
+    height: 22px;
+    margin-top: 5px;
+    padding-top: 2px;
+    width: 78px; 
+}
+
+.selected {
+    border: 1px solid #666666;
+    border-bottom: 1px solid white;
+    color: black;    
+    font-size: 12px;
+    line-height: 15px;
+    padding-top: 6px;
+    width: 78px; 
+}
+
+.selected:hover {
+    height: 23px;
+    margin-top: 0;
+    padding-top: 6px;
+    width: 78px; 
 }
