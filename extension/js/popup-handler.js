@@ -42,21 +42,36 @@ function getStreamList() {
                     '<td class="name">'+name+'</a></td>'+
                     '<td class="viewers">'+viewers+'</td></tr>');
             });
-            
+
             jQuery('tr.stream_row').click(function() {
                 chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
                 window.close();
                 return false;
             });
 
-            jQuery('tr.stream_row').tooltip({
-                html:true,
-                position: {
-                    my: "top+20",
-                    at: "center"
-                },
-                
-                tooltipClass: 'tooltip'
+            jQuery('tr.stream_row').each(function() {
+                var top = jQuery(this).position().top;
+                var my = "center bottom";
+                var at = "center top-7";
+                var tt_class = "top";
+                if (top < 160) {
+                    my = "top+17";
+                    at = "center";
+                    tt_class = "bottom";                  
+                }
+                jQuery(this).tooltip({
+                    html:true,
+                    position: {
+                        my: my, 
+                        at: at
+                    },
+                    tooltipClass: tt_class
+                });                     
+            });
+
+
+            jQuery('tr.stream_row').hover(function() {
+                console.log(jQuery(this).position().top);
             });
         }
     );
