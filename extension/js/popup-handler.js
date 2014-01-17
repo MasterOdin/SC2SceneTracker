@@ -22,21 +22,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*
  * Relates to https://github.com/justintv/Twitch-API/blob/master/v2_resources/streams.md
  */
+
+var settings = [];
+settings['popout'] = 'false';
+
 function getStreamList() {
+    var got_streams = false;
     jQuery.getJSON('https://api.twitch.tv/kraken/streams',
         { 
             game: "StarCraft II: Heart of the Swarm", 
             limit: 15 
         },
         function(data) {
-            var items = [];
+            
             jQuery.each(data.streams,function(key,value) {
-                var url = value['channel']['url']+"/popout";
+                got_streams = true;
+                var url = value['channel']['url']+(settings['popout'] == "true" ? "/popout" : "");
                 var alt = value['channel']['status'];
                 var name = value['channel']['display_name'];
                 var viewers = value['viewers'];
 
-                var logo = (value['channel']['logo'] == null) ? '../images/no_logo-70x70.jpeg' : value['channel']['logo'].replace("300x300","70x70");
+                var logo = (value['channel']['logo'] == null) ? '../images/no_logo-70x70.jpeg' : value['channel']['logo'].replace("300x300","70x70");   
                 jQuery('table#streams').append('<tr class="stream-row" title="'+alt+'">'+
                     '<td class="logo"><a class="stream" href="'+url+'" alt="'+alt+'"><img class="stream-logo" src="'+logo+'" /></a></td>'+
                     '<td class="name">'+name+'</a></td>'+
@@ -68,17 +74,57 @@ function getStreamList() {
                     tooltipClass: tt_class
                 });                     
             });
-
-
-            jQuery('tr.stream_row').hover(function() {
-                console.log(jQuery(this).position().top);
-            });
+            
+            if (got_streams == false) {
+                jQuery('#streams').append("<tr><td colspan='3'>Twitch didn't return any streams. Try again later. :(</td></tr>");
+            }
         }
     );
+}
 
+function updateStreams() {
+    jQuery('.stream-row').each(function() {
+        if (settings['popout'] == 'true') {
+            jQuery(this).find('a').attr('href',jQuery(this).find('a').attr('href')+"/popout");
+        }
+        else {
+            jQuery(this).find('a').attr('href',jQuery(this).find('a').attr('href').replace("/popout",""));
+        }
+    });
+}
+
+function getSettingsList() {
+    for (i in settings) {
+        var setting = localStorage.getItem(i);
+        if (setting == undefined || setting == "undefined") {
+            localStorage.setItem(i,settings[i]);
+        }
+        else {
+            settings[i] = setting;
+        }
+    }
+
+    jQuery('input[type=checkbox]').each(function() {
+        if (settings[jQuery(this).attr('name')] == "true") {
+            jQuery(this).attr('checked',true);
+        }
+    }).click(function() {
+        localStorage.setItem(jQuery(this).attr('name'),jQuery(this).prop('checked'));
+        settings[jQuery(this).attr('name')] = jQuery(this).prop('checked').toString();
+
+        switch (jQuery(this).attr('name')) {
+            case 'popout':
+                updateStreams();
+                break;
+            default:
+                console.log("no setting changed");
+                break;
+        }
+    });
 }
 
 function tabs() {
+    jQuery("#content-"+jQuery('.selected').attr('id')).css('display','block');
     jQuery( ".tab" ).click( function () {
         jQuery('#content-'+jQuery( ".selected" ).attr('id')).css('display','none');
         jQuery(".selected").removeClass( "selected" );
@@ -88,6 +134,9 @@ function tabs() {
 }
  
 document.addEventListener('DOMContentLoaded', function() {
-    getStreamList();
     tabs();
+    getSettingsList();
+    getStreamList();
+    //getNewsList();
+    
 });
