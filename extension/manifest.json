@@ -16,9 +16,5 @@
   "permissions": [ 
       "https://api.twitch.tv/",
       "tabs"
-    ],
-   "background": {
-      "page": "popup.html"
-   }
-
+    ]
 }
