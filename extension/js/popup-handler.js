@@ -49,31 +49,7 @@ function getStreamList() {
                     '<td class="viewers">'+viewers+'</td></tr>');
             });
 
-            jQuery('tr.stream-row').click(function() {
-                chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
-                window.close();
-                return false;
-            });
-
-            jQuery('tr.stream-row').each(function() {
-                var top = jQuery(this).position().top;
-                var my = "center bottom";
-                var at = "center top-7";
-                var tt_class = "top";
-                if (top < 160) {
-                    my = "top+17";
-                    at = "center";
-                    tt_class = "bottom";                  
-                }
-                jQuery(this).tooltip({
-                    html:true,
-                    position: {
-                        my: my, 
-                        at: at
-                    },
-                    tooltipClass: tt_class
-                });                     
-            });
+            setupTableRows('stream-row');
             
             if (got_streams == false) {
                 jQuery('#streams').append("<tr><td colspan='3'>Twitch didn't return any streams. Try again later. :(</td></tr>");
@@ -98,13 +74,50 @@ function getDay9Feed() {
             items.push(item);
 
         });
-        items.reverse();
-        var found = 0;
-        while (found < 15 && items.length > 0) {
-            item = items.pop();
-            jQuery('table#tday9').append('<tr><td>'+item['title']+'</td></tr>');
-            found++;
+        if (items.length > 0) {
+            items.reverse();
+            var found = 0;
+            while (found < 15 && items.length > 0) {
+                item = items.pop();
+                var p = item['title'].split(' - ');
+                var desc = p.slice(1,p.length).join(" - ").replace(" by Day9", "");
+                console.log(desc);
+                jQuery('table#tday9').append('<tr class="day9-row" title="'+desc+'"><td><a href="'+item['link']+'" alt="'+desc+'"></a>'+p[0]+'</td></tr>');
+                found++;
+            }
+
+            setupTableRows('day9-row');
         }
+        else {
+            jQuery('table#tday9').append('<tr><td>day9.tv doesn\'t appear to be up! :(</td></tr>');
+        }
+    });
+}
+
+function setupTableRows(class_name) {
+    var count = 0;
+    jQuery('tr.'+class_name).each(function() {
+        var my = "center bottom";
+        var at = "center top-7";
+        var tt_class = "top";
+        if (count < 6) {
+            my = "top+17";
+            at = "center";
+            tt_class = "bottom";
+        }
+        jQuery(this).tooltip({
+            html:true,
+            position: {
+                my: my, 
+                at: at
+            },
+            tooltipClass: tt_class
+        });
+        count++;
+    }).click(function() {
+        chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
+        window.close();
+        return false;
     });
 }
 

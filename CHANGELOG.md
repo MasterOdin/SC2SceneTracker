@@ -1,6 +1,11 @@
 SC2 Stream Tracker Changelog
 =========================================
 
+### v0.0.1
+```
+
+```
+
 ### v0.0.0.9
 ```
 - Added support for tabs within the topmost tab structure
