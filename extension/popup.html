@@ -7,26 +7,45 @@
 <link rel="stylesheet" type="text/css" href="css/popup.css" />
 </head>
 <body>
-<ul id="tabs">
-    <li id='twitch' class="tab selected"><img width="24px" src='images/twitch_logo.png' /> Watch</li>
-    <li id='liquid' class="tab"><img width="20px" src='images/team_liquid.png' /> News</li>    
+<ul id="tabs-main" class="tabs">
+    <li id='watch' class="tab selected">Watch</li>
+    <li id='news' class="tab"><img width="20px" src='images/team_liquid.png' /> News</li>    
     <li id='settings' class="tab"><img width="16px" src="images/settings_cog.png" /> Settings</li>
 </ul>
-<div class="content" id="content-twitch">
-    <table id="streams">
-        <tr>
-            <th colspan='2' class='tname'>Streamer</th>
-            <th class='tviewers'>Viewers</th>
-        </tr>
-    </table>
+<div class="content" id="content-watch">
+    <ul id="tabs-watch" class="tabs">
+        <li id='twitch' class="tab selected">Twitch</li>
+        <li id="day9" class="tab">Day9</li>
+    </ul>
+    <div id='content-twitch' class='content'>
+        <table id="streams">
+            <tr>
+                <th colspan='2' class='tname'>Streamer</th>
+                <th class='tviewers'>Viewers</th>
+            </tr>
+        </table>
+    </div>
+    <div id='content-day9' class='content'>
+        <table id="tday9">
+        </table>
+    </div>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<div class="content" id="content-liquid">
+<div class="content" id="content-news">
 No news or anything is grabbed yet! :(
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-settings">
-<label><input type="checkbox" name="popout" /> Popout Stream?
+    <div class='settings'>
+        <h3>Settings</h3>
+        <label><input type="checkbox" name="popout" /> Popout Stream?</label>
+    </div>
+    <div class='about'>
+        <h3>About</h3>
+        Author: Matthew "Master_Odin" Peveler<br />
+        Version: 0.0.0.9 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
+        Contribute: <a href='https://github.com/MasterOdin/SC2StreamTracker'>Github</a>
+    </div>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 </body>

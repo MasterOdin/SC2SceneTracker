@@ -82,6 +82,32 @@ function getStreamList() {
     );
 }
 
+function getDay9Feed() {
+    var items = [];
+    var item;
+    jQuery.get("http://day9.tv/rss/", function(data) {
+        var xml = jQuery(data);
+        xml.find("item").each(function() {
+            item = {
+                title: jQuery(this).find("title").text(),
+                link: jQuery(this).find("link").text(),
+                description: jQuery(this).find("description").text(),
+                pubDate: jQuery(this).find("pubDate").text(),
+                author: jQuery(this).find("author").text()
+            }
+            items.push(item);
+
+        });
+        items.reverse();
+        var found = 0;
+        while (found < 15 && items.length > 0) {
+            item = items.pop();
+            jQuery('table#tday9').append('<tr><td>'+item['title']+'</td></tr>');
+            found++;
+        }
+    });
+}
+
 function updateStreams() {
     jQuery('.stream-row').each(function() {
         if (settings['popout'] == 'true') {
@@ -121,22 +147,33 @@ function getSettingsList() {
                 break;
         }
     });
+
+    jQuery('a').click(function() {
+        chrome.tabs.create({url:jQuery(this).attr('href')});
+        window.close();
+        return false;        
+    });
 }
 
 function tabs() {
-    jQuery("#content-"+jQuery('.selected').attr('id')).css('display','block');
+    jQuery('.selected').each(function() {
+        jQuery('#content-'+jQuery(this).attr('id')).css('display','block');
+    });
     jQuery( ".tab" ).click( function () {
-        jQuery('#content-'+jQuery( ".selected" ).attr('id')).css('display','none');
-        jQuery(".selected").removeClass( "selected" );
+        var elem = jQuery(this).parent().children('.selected');
+        jQuery('#content-'+elem.attr('id')).css('display','none');
+        elem.removeClass( "selected" );
         jQuery( this ).addClass( "selected" );
         jQuery("#content-"+jQuery(this).attr('id')).css('display','block');
     });
 }
- 
+
+
 document.addEventListener('DOMContentLoaded', function() {
     tabs();
     getSettingsList();
     getStreamList();
+    getDay9Feed();
     //getNewsList();
     
 });
