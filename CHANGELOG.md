@@ -1,9 +1,17 @@
 SC2 Stream Tracker Changelog
 =========================================
 
+### v0.0.2
+```
+- Clean up Day9 Table HTML
+- Put description into Day9 popup instead of just title
+- Modify news tab (as getting news from TL impossible atm)
+- Add some code comments
+```
 ### v0.0.1
 ```
-
+- Finish up basic day9 functionality
+- Fix popup for streams that have the " character and --> sequence of characters
 ```
 
 ### v0.0.0.9

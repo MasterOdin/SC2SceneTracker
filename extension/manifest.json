@@ -1,6 +1,6 @@
 {
   "name": "SC2 Stream Tracker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "description": "Keeping track of twitch SC2 streams for you!",
   "icons": {
@@ -16,6 +16,7 @@
   "permissions": [ 
       "https://api.twitch.tv/",
       "http://day9.tv/",
+      "http://www.gosugamers.net/",
       "tabs"
     ],
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'"

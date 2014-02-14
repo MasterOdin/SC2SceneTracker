@@ -9,16 +9,17 @@
 <body>
 <ul id="tabs-main" class="tabs">
     <li id='watch' class="tab selected">Watch</li>
-    <li id='news' class="tab"><img width="20px" src='images/team_liquid.png' /> News</li>    
+    <li id='news' class="tab"><img src='images/gosugamers_logo.png' /> News</li>    
     <li id='settings' class="tab"><img width="16px" src="images/settings_cog.png" /> Settings</li>
 </ul>
 <div class="content" id="content-watch">
     <ul id="tabs-watch" class="tabs">
         <li id='twitch' class="tab selected"><img src='images/twitch_logo.png' width='20px'/> Twitch</li>
-        <li id="day9" class="tab">Day9</li>
+        <li id="day9" class="tab">Day[9] TV</li>
     </ul>
     <div id='content-twitch' class='content'>
         <table id="streams">
+
             <tr>
                 <th colspan='2' class='tname'>Streamer</th>
                 <th class='tviewers'>Viewers</th>
@@ -27,12 +28,36 @@
     </div>
     <div id='content-day9' class='content'>
         <table id="tday9">
+            <span id="day9-live-row"></div>
+            <tr>
+                <th>Number</th>
+                <th style='text-align:left'>Subject</th>
         </table>
     </div>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-news">
-No news or anything is grabbed yet! :(
+    <table id='tgg'>
+    </table>
+    <!--<ul id="tabs-watch" class="tabs">
+        <li id='liquid' class="tab selected"><img width="20px" src='images/team_liquid.png' /> TeamLiquid</li>
+        <li id="gg" class="tab"><img src='images/gosugamers_logo.png' /> GosuGamers</li>
+    </ul>
+    <div id='content-liquid' class='content'>
+        <table id="tliquid">
+            <tr>
+                <th colspan='2' class='tname'>Streamer</th>
+                <th class='tviewers'>Viewers</th>
+            </tr>
+        </table>
+    </div>
+    <div id='content-gg' class='content'>
+        <table id="tgg">
+            <tr>
+                <th>Number</th>
+                <th style='text-align:left'>Subject</th>
+        </table>
+    </div>-->
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-settings">
@@ -43,7 +68,7 @@ No news or anything is grabbed yet! :(
     <div class='about'>
         <h3>About</h3>
         Author: Matthew "Master_Odin" Peveler<br />
-        Version: 0.0.1 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
+        Version: 0.0.2 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
         Contribute: <a href='https://github.com/MasterOdin/SC2StreamTracker'>Github</a>
     </div>
 </div>
