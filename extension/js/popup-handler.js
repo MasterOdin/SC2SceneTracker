@@ -61,7 +61,7 @@ function getStreamList() {
                 jQuery('table#streams').append('<tr class="stream-row" title="'+alt+'">'+
                     '<td class="logo"><a class="stream" href="'+url+'"><img class="stream-logo" src="'+logo+'" /></a></td>'+
                     '<td class="name">'+name+'</a></td>'+
-                    '<td class="viewers">'+viewers+'</td></tr>');
+                    '<td class="viewers td-alt">'+viewers+'</td></tr>');
             });
 
             setupTooltips('stream-row');
@@ -117,7 +117,8 @@ function getDay9Feed() {
                 if (item['title'].indexOf('Funday Monday') > -1) {
                     desc = desc.slice(0,slice+1);
                 }
-                jQuery('table#tday9').append('<tr class="day9-row" width="20%" title="'+desc+'"><td><a href="'+item['link']+'"></a>'+p[0]+'</td><td width="80%">'+title+'</td></tr>');
+                jQuery('table#tday9').append('<tr class="day9-row" width="19%" title="'+desc+'"><td class="td-alt">'+
+                    '<a href="'+item['link']+'"></a>'+p[0]+'</td><td width="81%">'+title+'</td></tr>');
                 found++;
             }
             setupTooltips('day9-row');
@@ -136,7 +137,7 @@ function getDay9Feed() {
 
 function getGGNews() {
     var items = [];
-    var item, i;
+    var item, i, desc, title;
     jQuery.get("http://www.gosugamers.net/starcraft2/news/rss", function(data) {
         var xml = jQuery(data);
         xml.find("item").each(function() {
@@ -153,14 +154,20 @@ function getGGNews() {
             items.reverse();
             while (items.length > 0) {
                 item = items.pop();
-                jQuery('table#tgg').append('<tr class="gg-row" title="'+item['desc']+'><td>'+item['title']+'</td></tr>');
+                if (item['title'].length > 55) {
+                    title = item['title'].substr(0,55);
+                    // this ensures we don't have a "..." in the middle of a word, which looks nicer I think
+                    title = title.substr(0,55-title.split("").reverse().join("").indexOf(" ")-1) + "...";
+                }
+                else {
+                    title = item['title'];
+                }
+                desc = item['desc'].substr(3,item['desc'].indexOf('</p>')-3).replace(/"/g,'&quot;').replace(/>/g,"&gt;");
+                jQuery('table#tgg').append('<tr class="gg-row" title="'+desc+'"><td><a href="'+item['link']+'"></a>'+title+'</td></tr>');
             }
             setupTooltips('gg-row');
         }        
     });
-
-
-
 }
 
 /*

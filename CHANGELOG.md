@@ -1,6 +1,11 @@
 SC2 Stream Tracker Changelog
 =========================================
 
+### v0.1
+```
+- First general release of extension on chrome store
+- Fix up printing of GG news (and have hover text be description and not show any <p> tags or something)
+```
 ### v0.0.2
 ```
 - Clean up Day9 Table HTML
