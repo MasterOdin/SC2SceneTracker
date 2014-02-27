@@ -25,9 +25,9 @@ $links = array(
 foreach (array('featured','community') as $k) {
     $enough = false;
     $p = 1;
+    $temp = array();
     while ($enough == false) {
         $html = file_get_html($links[$k]."?p=".$p);
-        $temp = array();
         foreach ($html->find('table.lightborder') as $table) {
             foreach ($table->find('tr') as $tr) {
                 // we only care about rows that have a type, skip the ones that don't
@@ -44,12 +44,12 @@ foreach (array('featured','community') as $k) {
                 }        
             }
         }
-        $$k = $temp;
         $p++;
-        if (count($$k) >= 20) {
+        if (count($temp) >= 20) {
             $enough = true;
         }
     }
+    $$k = $temp;
 }
 
 $obj = array(
@@ -71,11 +71,14 @@ function convertDate($date) {
      $month_convert = array( 'Jan' => '01', 'Feb' => '02', 
         'Mar' => '03', 'May' => '04', 'Apr' => '05', 'Jun' => '06', 'Jul' => '07', 
         'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' );
-    $year = substr($date,7);
     $day = intval(substr($date,0,2));
-    $s = 3;
-    if ($day < 10) $s = 2;
-    $month = substr($date,$s,3);
+    $s = 0;
+    if ($day < 10) {
+        $s = 1;
+        $day = "0".$day;
+    }
+    $month = substr($date,(3-$s),3);
+    $year = substr($date,(7-$s));
     $new_date = $year.$month_convert[$month].$day;
     return $new_date;
 }
