@@ -10,6 +10,11 @@
   API Version: v1
 */
 
+if ($_SERVER['SERVER_NAME'] == "127.0.0.1" || $_SERVER['SERVER_NAME'] == "localhost") {
+    ini_set('display_errors',1);
+    ini_set('display_startup_errors',1);
+    error_reporting(-1);
+}
 
 include('vendor/simple_html_dom.php');
 $links = array(
@@ -17,26 +22,34 @@ $links = array(
     'community' => 'http://www.teamliquid.net/news/community/'
 );
 
-foreach(array('featured','community') as $k) {
-    $html = file_get_html($links[$k]);
-    $temp = array();
-    foreach($html->find('table.lightborder') as $table) {
-        foreach($table->find('tr') as $tr) {
-            // we only care about rows that have a type, skip the ones that don't
-            if($tr->children(1)->children(0) != "") {
-                $type = $tr->children(1)->children(0)->plaintext;
-                if($type == "StarCraft 2: ") {
-                    $link = $tr->children(1)->children(2);
-                    $temp[] = array(
-                        'title' => $link->plaintext,
-                        'link'  => $link->href,
-                        'date'  => convertDate($tr->children(2)->plaintext)
-                    );
-                }            
-            }        
+foreach (array('featured','community') as $k) {
+    $enough = false;
+    $p = 1;
+    while ($enough == false) {
+        $html = file_get_html($links[$k]."?p=".$p);
+        $temp = array();
+        foreach ($html->find('table.lightborder') as $table) {
+            foreach ($table->find('tr') as $tr) {
+                // we only care about rows that have a type, skip the ones that don't
+                if ($tr->children(1)->children(0) != "") {
+                    $type = $tr->children(1)->children(0)->plaintext;
+                    if ($type == "StarCraft 2: ") {
+                        $link = $tr->children(1)->children(2);
+                        $temp[] = array(
+                            'title' => $link->plaintext,
+                            'link'  => $link->href,
+                            'date'  => convertDate($tr->children(2)->plaintext)
+                        );
+                    }            
+                }        
+            }
+        }
+        $$k = $temp;
+        $p++;
+        if (count($$k) >= 20) {
+            $enough = true;
         }
     }
-    $$k = $temp;
 }
 
 $obj = array(
@@ -59,8 +72,10 @@ function convertDate($date) {
         'Mar' => '03', 'May' => '04', 'Apr' => '05', 'Jun' => '06', 'Jul' => '07', 
         'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' );
     $year = substr($date,7);
-    $day = substr($date,0,2);
-    $month = substr($date,3,3);
+    $day = intval(substr($date,0,2));
+    $s = 3;
+    if ($day < 10) $s = 2;
+    $month = substr($date,$s,3);
     $new_date = $year.$month_convert[$month].$day;
     return $new_date;
 }

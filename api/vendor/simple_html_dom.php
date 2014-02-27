@@ -64,6 +64,20 @@ define('DEFAULT_TARGET_CHARSET', 'UTF-8');
 define('DEFAULT_BR_TEXT', "\r\n");
 define('DEFAULT_SPAN_TEXT', " ");
 define('MAX_FILE_SIZE', 600000);
+
+function url_get_contents ($Url) {
+    if (!function_exists('curl_init')){ 
+        return file_get_contents($Url);
+    }
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $Url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
+}
+
+
 // helper functions
 // -----------------------------------------------------------------------------
 // get html dom from file
@@ -73,7 +87,7 @@ function file_get_html($url, $use_include_path = false, $context=null, $offset =
 	// We DO force the tags to be terminated.
 	$dom = new simple_html_dom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
 	// For sourceforge users: uncomment the next line and comment the retreive_url_contents line 2 lines down if it is not already done.
-	$contents = file_get_contents($url, $use_include_path, $context, $offset);
+	$contents = url_get_contents($url, $use_include_path, $context, $offset);
 	// Paperg - use our own mechanism for getting the contents as we want to control the timeout.
 	//$contents = retrieve_url_contents($url);
 	if (empty($contents) || strlen($contents) > MAX_FILE_SIZE)
@@ -1094,7 +1108,7 @@ class simple_html_dom
 	function load_file()
 	{
 		$args = func_get_args();
-		$this->load(call_user_func_array('file_get_contents', $args), true);
+		$this->load(call_user_func_array('url_get_contents', $args), true);
 		// Throw an error if we can't properly load the dom.
 		if (($error=error_get_last())!==null) {
 			$this->clear();
