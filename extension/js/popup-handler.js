@@ -1,30 +1,42 @@
 /*
-Copyright (c) 2014 Matthew "Master_Odin" Peveler
+  (c) Matthew "Master_Odin" Peveler <matt.peveler@gmail.com>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+  For the full copyright and license information, please view the LICENSE
+  file that was distributed with this source code.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  JS file for generating the contents of the popup.html view
 */
 
-var settings = [];
-var day9live = false;
-var day9link = "http://www.twitch.tv/day9tv";
-settings['popout'] = 'false';
-
 /*
+ * we can easily update this once new game comes out based on previous games:
+ * 1) StarCraft II: Wings of Liberty
+ * 2) StarCraft II: Heart of the Swarm
+ * 3) StarCraft II: Legacy of the Void (Release: TBA)
+ * We'll want to add "game switching" for LoV beta until transition of pros
+ * totally complete
+ */
+var twitch_game = "StarCraft II: Heart of the Swarm";
+var day9_link = "http://www.twitch.tv/day9tv";
+var day9_live = false;
+
+var settings = [];
+settings['popout']  = 'false';
+settings['tl_news'] = '0';
+
+/**
+ * gets run at page load and inserts custom JS
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    tabs();
+    getSettingsList();
+    getStreamList();
+    getDay9Feed();
+    getGGNews();
+    getTLNews();
+    getGGRankings();
+});
+
+/**
  * getStreamList()
  *
  * Gets current stream list from twitch's api (which returns a "stream" object)
@@ -32,17 +44,10 @@ settings['popout'] = 'false';
  */
 function getStreamList() {
     var got_streams = false;
-    jQuery.getJSON('https://api.twitch.tv/kraken/streams',
+    jQuery.getJSON("https://api.twitch.tv/kraken/streams",
         {
-            /*
-             * we can easily update this once new game comes out based on previous games:
-             * 1) StarCraft II: Wings of Liberty
-             * 2) StarCraft II: Heart of the Swarm
-             * 3) StarCraft II: Legacy of the Void (Release: TBA)
-             * We'll want to add "game switching" for LoV beta until transition of pros
-             * totally complete
-             */
-            game: "StarCraft II: Heart of the Swarm",
+
+            game: twitch_game,
             limit: 15
         },
         function(data) {
@@ -54,7 +59,7 @@ function getStreamList() {
                 var name = value['channel']['display_name'];
                 var viewers = value['viewers'];
                 if (value['channel']['name'] == "day9tv") {
-                    day9live = true;
+                    day9_live = true;
                 }
 
                 var logo = (value['channel']['logo'] == null) ? '../images/no_logo-70x70.jpeg' : value['channel']['logo'].replace("300x300","70x70");
@@ -73,7 +78,7 @@ function getStreamList() {
     ).error(function() { jQuery('#streams').append("<tr><td colspan='3'>Twitch didn't return any streams. Try again later. :(</td></tr>"); });
 }
 
-/*
+/**
  * getDay9Feed()
  *
  * Fetches and parses the Day9TV RSS feed (as there is no good JSON feed to fetch). Fields returned per item from the feed are
@@ -95,9 +100,9 @@ function getDay9Feed() {
             }
         });
 
-        if (day9live == true) {
+        if (day9_live == true) {
             jQuery('table#tday9').prepend('<tr id="day9-live"><td colspan="2" style="color: #C00000; text-align: center;">'+
-                '<a href="'+day9link+'"></a>~~ Day9 is Live!! ~~</td></tr>').click(function() {
+                '<a href="'+day9_link+'"></a>~~ Day9 is Live!! ~~</td></tr>').click(function() {
                     chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
                     window.close();
                     return false;
@@ -117,8 +122,11 @@ function getDay9Feed() {
                 if (item['title'].indexOf('Funday Monday') > -1) {
                     desc = desc.slice(0,slice+1);
                 }
-                jQuery('table#tday9').append('<tr class="day9-row" width="19%" title="'+desc+'"><td class="td-alt">'+
-                    '<a href="'+item['link']+'"></a>'+p[0]+'</td><td width="81%">'+title+'</td></tr>');
+                if (title.length > 40) {
+                    title = title.substr(0,40-title.split("").reverse().join("").indexOf(" ")-1) + "...";
+                }
+                jQuery('table#tday9').append('<tr class="day9-row" width="22%" title="'+desc+'"><td class="td-alt">'+
+                    '<a href="'+item['link']+'"></a>'+p[0]+'</td><td width="78%">'+title+'</td></tr>');
                 found++;
             }
             setupTooltips('day9-row');
@@ -129,12 +137,11 @@ function getDay9Feed() {
     });
 }
 
-/*
+/**
  * getGGNews()
  *
  * Fetch news from GosuGamer's RSS feed (http://www.gosugamers.net/starcraft2/news/rss)
  */
-
 function getGGNews() {
     var items = [];
     var item, i, desc, title;
@@ -170,7 +177,61 @@ function getGGNews() {
     });
 }
 
-/*
+/**
+ * getTLNews()
+ *
+ * Fetch news from the custom API (http://www.mpeveler.com/api/TeamLiquidNews/v1/)
+ * Returns a JSON object (Scraped info from TeamLiquid)
+ */
+function getTLNews() {
+    jQuery.getJSON('http://mpeveler.com/api/TeamLiquidNews/v1', function(data) {
+        var i = 0;
+        var news = [];
+        switch (parseInt(settings['tl_news'])) {
+            case 0:
+                for (i = 0; i < 20; i++) {
+                    if (data['team_liquid']['featured'][0]['date'] > data['team_liquid']['community'][0]['date']) {
+                        news.push(data['team_liquid']['featured'].shift());
+                    }
+                    else {
+                        news.push(data['team_liquid']['community'].shift());
+                    }
+                }
+                break;
+            case 1:
+                news = data['team_liquid']['featured'].slice(0,20);          
+                
+                break;
+            case 2:
+                news = data['team_liquid']['community'].slice(0,20);
+                break;
+        }
+        for (i = 0; i < news.length; i++) {
+            var item = news[i];
+            jQuery('table#tliquid').append('<tr class="tl-row" title="'+item['date']+'"><td><a href="http://www.teamliquid.net'+item['link']+'"></a>'+item['title']+'</td></tr>');
+        }
+        setupTooltips('tl-row');
+    });
+}
+
+/**
+ * getGGRankings()
+ *
+ * Fetch the rankings from the custom API (http://mpeveler.com/api/GosuGamersRankings/v1/)
+ * Returns a JSON object (scraped info from GosuGamers)
+ */
+function getGGRankings() {
+    jQuery.getJSON('http://mpeveler.com/api/GosuGamersRankings/v1',function(data) {
+        var items = data['gosugamers_rankings'];
+        for (var key in items) {
+            var item = items[key];
+            console.log(item);
+            jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td>'+item['name']+'</td><td>'+item['points']+'</td></tr>');
+        }
+    });
+}
+
+/**
  * setupTooltips(class_name)
  * param class_name: class name of the rows for the table to get the jQuery UI Tooltip
  *
@@ -203,7 +264,7 @@ function setupTooltips(class_name) {
     });
 }
 
-/*
+/**
  * updateTwitchLinks()
  *
  * Make the twitch links to either /popout or not based on popout setting being changed
@@ -220,15 +281,15 @@ function updateTwitchLinks() {
 
     if (day9live == true) {
         if (settings['popout'] == 'true') {
-            jQuery('#day9-live').find('a').attr('href',day9link+"/popout");
+            jQuery('#day9-live').find('a').attr('href',day9_link+"/popout");
         }
         else {
-            jQuery('#day9-live').find('a').attr('href',day9link);
+            jQuery('#day9-live').find('a').attr('href',day9_link);
         }
     }
 }
 
-/*
+/**
  * getSettingsList()
  *
  * Create settings tab content and necessary actions
@@ -245,7 +306,7 @@ function getSettingsList() {
     }
 
     if (settings['popout'] == 'true') {
-        day9link += "/popout";
+        day9_link += "/popout";
     }
 
     jQuery('input[type=checkbox]').each(function() {
@@ -255,13 +316,25 @@ function getSettingsList() {
     }).click(function() {
         localStorage.setItem(jQuery(this).attr('name'),jQuery(this).prop('checked'));
         settings[jQuery(this).attr('name')] = jQuery(this).prop('checked').toString();
-
         switch (jQuery(this).attr('name')) {
             case 'popout':
                 updateTwitchLinks();
                 break;
             default:
-                console.log("no setting changed");
+                //console.log("no setting changed");
+                break;
+        }
+    });
+
+    jQuery('select').each(function() {
+        jQuery('option[value="' + localStorage.getItem(jQuery(this).attr('name')) + '"]', this).first().attr('selected', 'selected');
+    }).change(function() {
+        localStorage.setItem(jQuery(this).attr('name'),jQuery(this).val());
+        settings[jQuery(this).attr('name')] = jQuery(this).val();
+        switch (jQuery(this).attr('name')) {
+            case 'tl_news':
+                jQuery('table#tliquid').empty();
+                getTLNews();
                 break;
         }
     });
@@ -273,7 +346,7 @@ function getSettingsList() {
     });
 }
 
-/*
+/**
  * tabs()
  *
  * create the tab JS for content switching as well as expanding selected one
@@ -290,12 +363,3 @@ function tabs() {
         jQuery("#content-"+jQuery(this).attr('id')).css('display','block');
     });
 }
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    tabs();
-    getSettingsList();
-    getStreamList();
-    getDay9Feed();
-    getGGNews();
-});

@@ -1,6 +1,11 @@
 SC2 Stream Tracker Changelog
 =========================================
 
+### v0.2
+```
+- Implement TeamLiquid news API
+- Implement GosuGamers rankings API
+```
 ### v0.1
 ```
 - First general release of extension on chrome store

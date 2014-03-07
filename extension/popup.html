@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery-ui.js"></script>
+<script type="text/javascript" src="js/vendor/jquery.js"></script>
+<script type="text/javascript" src="js/vendor/jquery-ui.js"></script>
 <script type="text/javascript" src="js/popup-handler.js"></script>
 <link rel="stylesheet" type="text/css" href="css/popup.css" />
 </head>
 <body>
 <ul id="tabs-main" class="tabs">
     <li id='watch' class="tab selected">Watch</li>
-    <li id='news' class="tab"><img src='images/gosugamers_logo.png' /> News</li>    
+    <li id='news' class="tab">News</li>
+    <li id='rankings' class="tab">Rankings</li>
     <li id='settings' class="tab"><img width="16px" src="images/settings_cog.png" /> Settings</li>
 </ul>
 <div class="content" id="content-watch">
@@ -32,43 +33,51 @@
             <tr>
                 <th>Number</th>
                 <th style='text-align:left'>Subject</th>
+            </tr>
         </table>
     </div>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-news">
-    <table id='tgg'>
-    </table>
-    <!--<ul id="tabs-watch" class="tabs">
+    <ul id="tabs-watch" class="tabs">
         <li id='liquid' class="tab selected"><img width="20px" src='images/team_liquid.png' /> TeamLiquid</li>
         <li id="gg" class="tab"><img src='images/gosugamers_logo.png' /> GosuGamers</li>
     </ul>
     <div id='content-liquid' class='content'>
         <table id="tliquid">
-            <tr>
-                <th colspan='2' class='tname'>Streamer</th>
-                <th class='tviewers'>Viewers</th>
-            </tr>
         </table>
     </div>
     <div id='content-gg' class='content'>
         <table id="tgg">
-            <tr>
-                <th>Number</th>
-                <th style='text-align:left'>Subject</th>
         </table>
-    </div>-->
+    </div>
+</div>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<div class="content" id="content-rankings">
+    <table id='trankings'>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Points</th>
+        </tr>    
+    </table>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-settings">
     <div class='settings'>
         <h3>Settings</h3>
-        <label><input type="checkbox" name="popout" /> Popout Stream?</label>
+        <label><input type="checkbox" name="popout" /> Popout Stream?</label><br />
+        <label>Display TL News from: 
+        <select name="tl_news">
+            <option value="0">Featured and Community</option>
+            <option value="1">Featured, not Community</option>
+            <option value="2">Community, not Featured</option>
+        </select>
     </div>
     <div class='about'>
         <h3>About</h3>
         Author: Matthew "Master_Odin" Peveler<br />
-        Version: 0.0.2 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
+        Version: 0.2 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
         Contribute: <a href='https://github.com/MasterOdin/SC2StreamTracker'>Github</a>
     </div>
 </div>

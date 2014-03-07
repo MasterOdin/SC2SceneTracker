@@ -154,17 +154,6 @@ tr:hover td {
     z-index: 100;
 }
 
-/*
-.tab:hover {
-    border: 1px solid #666666;
-    border-bottom: 1px solid white;
-    margin-left: 3px;
-    margin-right: 3px;
-    margin-top: 0;
-    color: black;
-}
-*/
-
 .selected,
 .tab:hover {
     border-left: 1px solid #666666;
