@@ -85,6 +85,10 @@ tr:hover td {
     cursor: pointer;
 }
 
+#trankings {
+    text-align: center;
+}
+
 .ui-tooltip {
   position: absolute;
   display: block;

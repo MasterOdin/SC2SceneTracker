@@ -225,8 +225,8 @@ function getGGRankings() {
         var items = data['gosugamers_rankings'];
         for (var key in items) {
             var item = items[key];
-            console.log(item);
-            jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td>'+item['name']+'</td><td>'+item['points']+'</td></tr>');
+            jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td style="text-align: left;">'+item['handle']+'</td><td>('+
+                item['wins']+' - '+item['loses']+')</td><td>'+item['points']+'</td></tr>');
         }
     });
 }
