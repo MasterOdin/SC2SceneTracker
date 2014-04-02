@@ -115,7 +115,7 @@ function getDay9Feed() {
             while (found < 15 && items.length > 0) {
                 item = items.pop();
                 var p = item['title'].replace(" by Day9","").split(' - ');
-                var title = p.slice(1,p.length).join(' - ');
+                var title = jQuery("<div/>").html(p.slice(1,p.length).join(' - ')).text();
                 var desc = item['desc'];
                 var slice = desc.indexOf('.');
                 if (slice == -1) slice = desc.indexOf('!');
