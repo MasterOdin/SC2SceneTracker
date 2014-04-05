@@ -1,6 +1,18 @@
 SC2 Stream Tracker Changelog
 =========================================
 
+### v1.0.0
+```
+- Developer better tooltip for TeamLiquid news
+- Create matches (upcoming/recent) from GosuGamers and make tab for it
+- Release to Google Chrome web store
+```
+### v0.2.1
+```
+- Add title of Day9 Daily/GG News/TL News to the tooltip popup
+- Improve some API functionality
+- Show date to tooltip popup on news and stuff (In Progress)
+```
 ### v0.2
 ```
 - Implement TeamLiquid news API
@@ -8,7 +20,7 @@ SC2 Stream Tracker Changelog
 ```
 ### v0.1
 ```
-- First general release of extension on chrome store
+- First "ready to use" release
 - Fix up printing of GG news (and have hover text be description and not show any <p> tags or something)
 ```
 ### v0.0.2

@@ -1,6 +1,8 @@
 /*
   (c) Matthew "Master_Odin" Peveler <matt.peveler@gmail.com>
 
+  Licensed under the MIT License
+  
   For the full copyright and license information, please view the LICENSE
   file that was distributed with this source code.
 
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     getGGNews();
     getTLNews();
     getGGRankings();
+    getGGMatches();
 });
 
 /**
@@ -46,12 +49,10 @@ function getStreamList() {
     var got_streams = false;
     jQuery.getJSON("https://api.twitch.tv/kraken/streams",
         {
-
             game: twitch_game,
             limit: 15
         },
         function(data) {
-            
             jQuery.each(data.streams,function(key,value) {
                 got_streams = true;
                 var url = value['channel']['url']+(settings['popout'] == "true" ? "/popout" : "");
@@ -116,6 +117,7 @@ function getDay9Feed() {
                 item = items.pop();
                 var p = item['title'].replace(" by Day9","").split(' - ');
                 var title = jQuery("<div/>").html(p.slice(1,p.length).join(' - ')).text();
+                var t_desc = title;
                 var desc = item['desc'];
                 var slice = desc.indexOf('.');
                 if (slice == -1) slice = desc.indexOf('!');
@@ -123,9 +125,9 @@ function getDay9Feed() {
                     desc = desc.slice(0,slice+1);
                 }
                 if (title.length > 40) {
-                    title = title.substr(0,40-title.split("").reverse().join("").indexOf(" ")-1) + "...";
+                    title = title.substr(0,40-title.substr(0,40).split("").reverse().join("").indexOf(" ")-1) + "...";
                 }
-                jQuery('table#tday9').append('<tr class="day9-row" width="22%" title="'+desc+'"><td class="td-alt">'+
+                jQuery('table#tday9').append('<tr class="day9-row" width="22%" title="'+t_desc+"|"+desc+'"><td class="td-alt">'+
                     '<a href="'+item['link']+'"></a>'+p[0]+'</td><td width="78%">'+title+'</td></tr>');
                 found++;
             }
@@ -233,6 +235,56 @@ function getGGRankings() {
 }
 
 /**
+ * getGGMatches()
+ *
+ * Fetch the matches from the custom API (http://sc2.mpevelerapi.com/GosuGamersMatches/v1/)
+ * The API returns a JSON object (scraped info from GosuGamers)
+ */
+function getGGMatches() {
+    jQuery.getJSON('http://localhost/sc2/GosuGamersMatches/v1/',function(data) {
+        var live = data['eventsLive'];
+        var upcoming = data['eventsUpcoming'];
+        var done = data['eventsDone'];
+        var row = "";
+        for (var key in live) {
+            var item = live[key];
+            var t = item['tournament']+"|"+item['time']+" GMT";
+            row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+            jQuery('table#tupcoming').append(row);
+        }
+        for (var key in upcoming) {
+            var item = upcoming[key];
+            var t = item['tournament']+"|"+item['time']+" GMT";
+            row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+            jQuery('table#tupcoming').append(row);            
+            console.log(item);
+        }
+        var score = "";
+        for (var key in done) {
+            var item = done[key];
+            if (item['winner'] == '0') {
+                item['w'] = '=';
+            }
+            else if (item['winner'] == '1') {
+                item['w'] = '>';
+            }
+            else {
+                item['w'] = '<';
+            }
+            var t = item['tournament']+"|"+item['time']+" GMT";
+            score = item['player_1']['score']+" : "+item['player_2']['score'];
+            row = "<tr class='ggm-row' title='"+t+"'><td width='10%'>"+score+"</td>"+
+            "<td width='40%' align='center'>"+item['player_1']['name']+"</td><td width='10%'>"+item['w']+"</td>"+
+            "<td width='40%' align='center'>"+item['player_2']['name']+"</td></tr>";
+            jQuery('table#tresults').append(row);            
+            console.log(item);
+        }
+        setupTooltips('ggm-row');
+    });
+
+}
+
+/**
  * setupTooltips(class_name)
  * param class_name: class name of the rows for the table to get the jQuery UI Tooltip
  *
@@ -255,7 +307,10 @@ function setupTooltips(class_name) {
                 my: my, 
                 at: at
             },
-            tooltipClass: tt_class
+            tooltipClass: tt_class,
+            content: function(callback) { 
+                callback($(this).prop('title').replace('|', '<br />')); 
+            }
         });
         count++;
     }).click(function() {

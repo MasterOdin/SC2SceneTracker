@@ -10,8 +10,8 @@
 <ul id="tabs-main" class="tabs">
     <li id='watch' class="tab selected">Watch</li>
     <li id='news' class="tab">News</li>
+    <li id='matches' class="tab">Matches</li>
     <li id='rankings' class="tab">Rankings</li>
-    <li id='results' class="tab">Results</li>
     <li id='settings' class="tab"><img width="16px" src="images/settings_cog.png" /> Settings</li>
 </ul>
 <div class="content" id="content-watch">
@@ -40,7 +40,7 @@
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-news">
-    <ul id="tabs-watch" class="tabs">
+    <ul id="tabs-news" class="tabs">
         <li id='liquid' class="tab selected"><img width="20px" src='images/team_liquid.png' /> TeamLiquid</li>
         <li id="gg" class="tab"><img src='images/gosugamers_logo.png' /> GosuGamers</li>
     </ul>
@@ -54,6 +54,21 @@
     </div>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<div class="content" id="content-matches">
+    <ul id='tabs-matches' class="tabs">
+        <li id="upcoming" class="tab selected">Upcoming</li>
+        <li id="results" class="tab">Results</li>
+    </ul>
+    <div id='content-upcoming' class='content'>
+        <table id='tupcoming'>
+        </table>
+    </div>
+    <div id='content-results' class='content'>
+        <table id='tresults'>
+        </table>
+    </div>
+</div>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="content" id="content-rankings">
     <table id='trankings'>
         <tr>
@@ -61,13 +76,6 @@
             <th width="60%" style="text-align: left" colspan='2'>Player</th>
             <th width="20%">Points</th>
         </tr>    
-    </table>
-</div>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<div class="content" id="content-results">
-    <table id='tresults'>
-        <tr>
-        </tr>
     </table>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -85,7 +93,7 @@
     <div class='about'>
         <h3>About</h3>
         Author: Matthew "Master_Odin" Peveler<br />
-        Version: 0.2 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md'>Changelog</a>)<br />
+        Version: 1.0.0 (<a href='https://github.com/MasterOdin/SC2StreamTracker/blob/master/CHANGELOG.md#v100'>Changelog</a>)<br />
         Contribute: <a href='https://github.com/MasterOdin/SC2StreamTracker'>Github</a>
     </div>
 </div>
