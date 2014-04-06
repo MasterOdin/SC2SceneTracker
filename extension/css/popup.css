@@ -25,6 +25,7 @@ a:hover {
 
 .content {
     display: none;
+    width: 100%;
 }
 
 h3 {

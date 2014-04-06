@@ -21,9 +21,18 @@ var twitch_game = "StarCraft II: Heart of the Swarm";
 var day9_link = "http://www.twitch.tv/day9tv";
 var day9_live = false;
 
+var milli_half_hour = 1800000;
+var milli_hour = 3600000;
+
 var settings = [];
 settings['popout']  = 'false';
 settings['tl_news'] = '0';
+settings['ggrankings'] = "";
+settings['ggrankingscache'] = "0";
+settings['ggmatches'] = "";
+settings['ggmatchescache'] = "0";
+settings['tlnews'] = "";
+settings['tlnewscache'] = "0";
 
 /**
  * gets run at page load and inserts custom JS
@@ -172,7 +181,7 @@ function getGGNews() {
                     title = item['title'];
                 }
                 desc = item['desc'].substr(3,item['desc'].indexOf('</p>')-3).replace(/"/g,'&quot;').replace(/>/g,"&gt;");
-                jQuery('table#tgg').append('<tr class="gg-row" title="'+desc+'"><td><a href="'+item['link']+'"></a>'+title+'</td></tr>');
+                jQuery('table#tgg').append('<tr class="gg-row" title="'+item['title']+"|"+item['pubDate']+'"><td><a href="'+item['link']+'"></a>'+title+'</td></tr>');
             }
             setupTooltips('gg-row');
         }        
@@ -186,34 +195,52 @@ function getGGNews() {
  * Returns a JSON object (Scraped info from TeamLiquid)
  */
 function getTLNews() {
-    jQuery.getJSON('http://mpeveler.com/api/TeamLiquidNews/v1', function(data) {
-        var i = 0;
-        var news = [];
-        switch (parseInt(settings['tl_news'])) {
-            case 0:
-                for (i = 0; i < 20; i++) {
-                    if (data['team_liquid']['featured'][0]['date'] > data['team_liquid']['community'][0]['date']) {
-                        news.push(data['team_liquid']['featured'].shift());
-                    }
-                    else {
-                        news.push(data['team_liquid']['community'].shift());
-                    }
+    var cache_time = parseInt(localStorage.getItem('tlnewscache'));
+    if(!getNextCacheHalfHour(cache_time)) {
+        setupTLNews(JSON.parse(localStorage.getItem('tlnews')),1);
+    }
+    else {
+        jQuery.getJSON('http://mpeveler.com/api/TeamLiquidNews/v1', function(data) {
+            setupTLNews(data,0);
+        });
+    }
+}
+
+function setupTLNews(data,local) {
+    var i = 0;
+    var news = [];
+    var copy = jQuery.extend(true, {}, data);
+    switch (parseInt(settings['tl_news'])) {
+        case 0:
+            for (i = 0; i < 20; i++) {
+                if (data['team_liquid']['featured'][0]['date'] > data['team_liquid']['community'][0]['date']) {
+                    news.push(data['team_liquid']['featured'].shift());
                 }
-                break;
-            case 1:
-                news = data['team_liquid']['featured'].slice(0,20);          
-                
-                break;
-            case 2:
-                news = data['team_liquid']['community'].slice(0,20);
-                break;
-        }
-        for (i = 0; i < news.length; i++) {
-            var item = news[i];
-            jQuery('table#tliquid').append('<tr class="tl-row" title="'+item['date']+'"><td><a href="http://www.teamliquid.net'+item['link']+'"></a>'+item['title']+'</td></tr>');
-        }
-        setupTooltips('tl-row');
-    });
+                else {
+                    news.push(data['team_liquid']['community'].shift());
+                }
+            }
+            break;
+        case 1:
+            news = data['team_liquid']['featured'].slice(0,20);          
+            
+            break;
+        case 2:
+            news = data['team_liquid']['community'].slice(0,20);
+            break;
+    }
+    for (i = 0; i < news.length; i++) {
+        var item = news[i];
+        var year = item['date'].substr(0,4);
+        var month = item['date'].substr(4,2);
+        var day = item['date'].substr(6,2);
+        jQuery('table#tliquid').append('<tr class="tl-row" title="'+item['title']+"|"+month+"/"+day+"/"+year+'"><td><a href="http://www.teamliquid.net'+item['link']+'"></a>'+item['title']+'</td></tr>');
+    }
+    setupTooltips('tl-row');
+    if (local == 0) {
+        localStorage.setItem('tlnews',JSON.stringify(copy));
+        localStorage.setItem('tlnewscache',jQuery.now());
+    }
 }
 
 /**
@@ -223,15 +250,32 @@ function getTLNews() {
  * Returns a JSON object (scraped info from GosuGamers)
  */
 function getGGRankings() {
-    jQuery.getJSON('http://mpeveler.com/api/GosuGamersRankings/v1',function(data) {
-        var items = data['gosugamers_rankings'];
-        for (var key in items) {
-            var item = items[key];
-            jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td style="text-align: left;">'+item['handle']+'</td>'+
-                '<td style="text-align:right">('+item['wins']+' - '+item['loses']+' | ' +Math.round((parseInt(item['wins'])/(parseInt(item['wins'])+
-                parseInt(item['loses']))*100))+'%)</td><td>'+item['points']+'</td></tr>');
-        }
-    });
+    var cache_time = parseInt(localStorage.getItem('ggrankingscache'));
+    if(!getNextCacheTomorrow(cache_time)) {
+        setupGGRankings(JSON.parse(localStorage.getItem('ggrankings')),1);
+    }
+    else {
+        jQuery.getJSON('http://mpeveler.com/api/GosuGamersRankings/v1',function(data) {
+            setupGGRankings(data,0);
+        });
+    }
+}
+
+function setupGGRankings(data,local) {
+    var items = data['gosugamers_rankings'];
+    for (var key in items) {
+        var item = items[key];
+        jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td style="text-align: left;">'+item['handle']+'</td>'+
+            '<td style="text-align:right">('+item['wins']+' - '+item['loses']+' | ' +Math.round((parseInt(item['wins'])/(parseInt(item['wins'])+
+            parseInt(item['loses']))*100))+'%)</td><td>'+item['points']+'</td></tr>');
+    }
+    if (local == 0) {
+        localStorage.setItem('ggrankings',JSON.stringify(data));
+        localStorage.setItem('ggrankingscache',jQuery.now());
+        console.log("non-local");
+    }    
+    else
+        console.log("local");
 }
 
 /**
@@ -241,47 +285,58 @@ function getGGRankings() {
  * The API returns a JSON object (scraped info from GosuGamers)
  */
 function getGGMatches() {
-    jQuery.getJSON('http://localhost/sc2/GosuGamersMatches/v1/',function(data) {
-        var live = data['eventsLive'];
-        var upcoming = data['eventsUpcoming'];
-        var done = data['eventsDone'];
-        var row = "";
-        for (var key in live) {
-            var item = live[key];
-            var t = item['tournament']+"|"+item['time']+" GMT";
-            row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
-            jQuery('table#tupcoming').append(row);
-        }
-        for (var key in upcoming) {
-            var item = upcoming[key];
-            var t = item['tournament']+"|"+item['time']+" GMT";
-            row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
-            jQuery('table#tupcoming').append(row);            
-            console.log(item);
-        }
-        var score = "";
-        for (var key in done) {
-            var item = done[key];
-            if (item['winner'] == '0') {
-                item['w'] = '=';
-            }
-            else if (item['winner'] == '1') {
-                item['w'] = '>';
-            }
-            else {
-                item['w'] = '<';
-            }
-            var t = item['tournament']+"|"+item['time']+" GMT";
-            score = item['player_1']['score']+" : "+item['player_2']['score'];
-            row = "<tr class='ggm-row' title='"+t+"'><td width='10%'>"+score+"</td>"+
-            "<td width='40%' align='center'>"+item['player_1']['name']+"</td><td width='10%'>"+item['w']+"</td>"+
-            "<td width='40%' align='center'>"+item['player_2']['name']+"</td></tr>";
-            jQuery('table#tresults').append(row);            
-            console.log(item);
-        }
-        setupTooltips('ggm-row');
-    });
+    var cache_time = parseInt(localStorage.getItem('ggmatchescache'));
+    if(!getNextCacheHalfHour(cache_time)) {
+        setupGGMatches(JSON.parse(localStorage.getItem('ggmatches')),1);
+    }
+    else {
+        jQuery.getJSON('http://localhost/sc2/GosuGamersMatches/v1/',function(data) {
+            setupGGMatches(data,0);
+        });
+    }
+}
 
+function setupGGMatches(data,local) {
+    var live = data['eventsLive'];
+    var upcoming = data['eventsUpcoming'];
+    var done = data['eventsDone'];
+    var row = "";
+    for (var key in live) {
+        var item = live[key];
+        var t = item['tournament']+"|"+item['time']+" GMT";
+        row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+        jQuery('table#tupcoming').append(row);
+    }
+    for (var key in upcoming) {
+        var item = upcoming[key];
+        var t = item['tournament']+"|"+item['time']+" GMT";
+        row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+        jQuery('table#tupcoming').append(row);            
+    }
+    var score = "";
+    for (var key in done) {
+        var item = done[key];
+        if (item['winner'] == '0') {
+            item['w'] = '=';
+        }
+        else if (item['winner'] == '1') {
+            item['w'] = '>';
+        }
+        else {
+            item['w'] = '<';
+        }
+        var t = item['tournament']+"|"+item['time']+" GMT";
+        score = item['player_1']['score']+" : "+item['player_2']['score'];
+        row = "<tr class='ggm-row' title='"+t+"'><td width='10%'>"+score+"</td>"+
+        "<td width='40%' align='center'>"+item['player_1']['name']+"</td><td width='10%'>"+item['w']+"</td>"+
+        "<td width='40%' align='center'>"+item['player_2']['name']+"</td></tr>";
+        jQuery('table#tresults').append(row);            
+    }
+    setupTooltips('ggm-row');
+    if (local == 0) {
+        localStorage.setItem('ggmatches',JSON.stringify(data));
+        localStorage.setItem('ggmatchescache',jQuery.now());
+    }
 }
 
 /**
@@ -308,8 +363,9 @@ function setupTooltips(class_name) {
                 at: at
             },
             tooltipClass: tt_class,
-            content: function(callback) { 
-                callback($(this).prop('title').replace('|', '<br />')); 
+            content: function(callback) {
+                //console.log($(this).prop('title').replace("|","<br />"));
+                callback($(this).prop('title').replace(/\|/g, '<br />')); 
             }
         });
         count++;
@@ -418,4 +474,51 @@ function tabs() {
         jQuery( this ).addClass( "selected" );
         jQuery("#content-"+jQuery(this).attr('id')).css('display','block');
     });
+}
+
+/**
+ * getNextCache(time,min)
+ * param cache_time : Date() obj for last cache time
+ *
+ * Given a date obj, returns True/False if the current time is after a 30
+ * min period (ie. 1:45 falls between 1:30 and 2:00, so we update once after 2:00)
+ */
+
+function getNextCacheHalfHour(cache_time) {
+    var dt = new Date();
+    var ct = new Date(cache_time);
+    var et = ct;
+    //var cur = parseInt(dt.getFullYear()+""+parseNumber(dt.getMonth())+""+parseNumber(dt.getDate())+""+parseNumber(dt.getHours())+""+parseNumber(dt.getMinutes()));
+    var current_min = parseInt(ct.getMinutes());
+    et.setMinutes(current_min-(current_min)%30);
+    et.setTime(et.getTime()+milli_half_hour);
+    //var next = parseInt(et.getFullYear()+""+parseNumber(et.getMonth())+""+parseNumber(et.getDate())+""+parseNumber(et.getHours())+""+parseNumber(et.getMinutes()));
+    //console.log(cur);
+    //console.log(next);
+    if (parseInt(dt.getTime()) > parseInt(et.getTime())) 
+        return true;
+    else
+        return false;
+}
+
+function getNextCacheTomorrow(cache_time) {
+    var dt = new Date();
+    var ct = new Date(cache_time);
+    var et = ct;
+    et.setHours(0);
+    et.setMinutes(0);
+    et.setTime(et.getTime()+(24*milli_hour));
+    //console.log(parseInt(dt.getFullYear()+""+parseNumber(dt.getMonth())+""+parseNumber(dt.getDate())+""+parseNumber(dt.getHours())+""+parseNumber(dt.getMinutes())));
+    //console.log(parseInt(et.getFullYear()+""+parseNumber(et.getMonth())+""+parseNumber(et.getDate())+""+parseNumber(et.getHours())+""+parseNumber(et.getMinutes())));
+    if (parseInt(dt.getTime()) > parseInt(et.getTime()))
+        return true;
+    else
+        return false;
+}
+
+function parseNumber(num) {
+    if (num < 10)
+        return "0"+num;
+    else
+        return num;
 }

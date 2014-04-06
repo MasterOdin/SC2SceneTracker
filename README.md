@@ -1,7 +1,7 @@
-SC2StreamTracker
+SC2SceneTracker
 ================
 
-Extension Name: SC2 Stream Tracker  
+Extension Name: SC2 Scene Tracker  
 
 Chrome extension that gives a nice pop-up with all current SC2:HotS streams with viewer count, etc. It's main function is to tell me what streams are on twitch at the moment, their status message, viewer count, etc. More features are planned as I want them (unless people start requesting stuff). Major issue with the very few extensions that exist is that they're primarily focused around the TeamLiquid stream list (which while good, doesn't have all available streams on it) or only work for Starcraft 2: Wings of Liberty, which has been abandoned for Starcraft 2: Heart of the Swarm. This project is for my desire to have something that is akin to [d2mt](https://github.com/wololodev/d2mt) except for SC2.
 
