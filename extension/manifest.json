@@ -17,8 +17,7 @@
       "https://api.twitch.tv/",
       "http://day9.tv/",
       "http://www.gosugamers.net/",
-      "http://mpeveler.com/api/*",
-      "tabs",
-      "http://localhost/sc2/*"
+      "http://sc2.mpevelerapi.com/",
+      "tabs"
     ]
 }

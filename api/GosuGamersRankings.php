@@ -20,18 +20,22 @@ if ($_SERVER['SERVER_NAME'] == "127.0.0.1" || $_SERVER['SERVER_NAME'] == "localh
 
 include('vendor/simple_html_dom.php');
 
-$html = file_get_html("http://www.gosugamers.net/starcraft2/rankings");
+$html = file_get_html("http://www.gosugamers.net/starcraft2/rankings#player");
 $players = array();
-foreach($html->find('tr.profile') as $player) {
-  //echo $player->children(2)->children(3);
-  $rank   = str_replace("#","",$player->children(0)->plaintext);
-  $handle = $player->children(2)->children(0)->children(0)->plaintext;
-  $name   = trim($player->children(2)->children(3)->plaintext);
-  $stats  = trim(preg_replace('/(.*?)\: ([0-9]*?)\-([0-9]*?) \((.*?)\)/',"$2|$3",$player->children(2)->children(4)->plaintext));
-  $stats  = explode("|",$stats);
-  $wins   = $stats[0];
-  $loses  = $stats[1];
-  $points = preg_replace('/\((.*?)\)/',"$1",$player->children(2)->children(0)->children(1)->plaintext);
+$a = $html->find('.simple',0);
+$i = 0;
+foreach($a->find('tr.ranking-link') as $player) {
+  if ($i == 20)
+    break;
+  $rank   = trim($player->find('.ranking',0)->plaintext);
+  $handle = trim($player->find('span',2)->plaintext);
+  $player_id = $player->getAttribute('data-id');
+  $player_info = file_get_html("http://www.gosugamers.net/starcraft2/rankings/show/player/".$player_id);
+  $name   = trim($player_info->find('p.sub-header',0)->plaintext);
+  $wins   = trim($player_info->find('.wins',0)->plaintext);
+  $loses  = trim($player_info->find('.losses',0)->plaintext);
+  $points = trim($player->find('.numbers',0)->plaintext);
+  $link   = "http://www.gosugamers.net/starcraft2/".trim($player_info->find('.base',0)->find('a',0)->href);
   //print $rank." ".$name." ".$points."<br />";
   $players[$rank] = array(
       'rank'   => $rank,
@@ -39,8 +43,10 @@ foreach($html->find('tr.profile') as $player) {
       'name'   => $name,
       'wins'   => $wins,
       'loses'  => $loses,
-      'points' => $points
+      'points' => $points,
+      'link'   => $link
   );
+  $i++;
 }
 
 $save = array('gosugamers_rankings' => $players);

@@ -31,6 +31,9 @@ if ($check) {
     $is_live = false;
 }
 
+$timezone = substr($matches->find('#time',0),strrpos($matches->find('#time',0)," "));
+$offset = ($timezone == "CET") ? -1 : -2;
+print $offset;
 $live = array();
 if ($is_live) {
     foreach($matches->find('.matches',0)->children(0)->children as $match) {
@@ -47,11 +50,12 @@ if ($is_live) {
         $tournament = $t_page->find('.box',0)->children(0)->children(0)->plaintext;
         $bestof = str_replace("Best of ","",$t_page->find('.bestof',0)->plaintext);
         $time = substr($t_page->find('.datetime',0)->plaintext,-5);
-        $hour = intval(explode(":",$time)[0])-1;
+        $hour = intval(explode(":",$time)[0])+$offset;
+        $hour = ($hour < 0) ? 23 : $hour;
         $time = str_pad($hour,2,"0",STR_PAD_LEFT).":".explode(":",$time)[1];
         $livein = "Live";
         $live[] = array('player_1'=>$player_a,'player_2'=>$player_b,
-           'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof, 'livein'=>$livein);
+           'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof, 'livein'=>$livein,'link'=>$link);
     }
 }
 
@@ -70,11 +74,12 @@ foreach($matches->find('.matches',$upcoming_num)->children(0)->children as $matc
     $tournament = $t_page->find('.box',0)->children(0)->children(0)->plaintext;
     $bestof = str_replace("Best of ","",$t_page->find('.bestof',0)->plaintext);
     $time = substr($t_page->find('.datetime',0)->plaintext,-5);
-    $hour = intval(explode(":",$time)[0])-1;
+    $hour = intval(explode(":",$time)[0])+$offset;
+    $hour = ($hour < 0) ? 24-$hour : $hour;
     $time = str_pad($hour,2,"0",STR_PAD_LEFT).":".explode(":",$time)[1];
     $livein = trim($match->find('.live-in',0)->plaintext);
     $upcoming[] = array('player_1'=>$player_a,'player_2'=>$player_b,
-       'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof,'livein'=>$livein);
+       'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof,'livein'=>$livein,'link'=>$link);
 }
 
 $i = 0;
@@ -110,7 +115,7 @@ foreach($matches->find('.matches',$results_num)->children(0)->children as $match
     $hour = intval(explode(":",$time)[0])-1;
     $time = str_pad($hour,2,"0",STR_PAD_LEFT).":".explode(":",$time)[1];
     $results[] = array('player_1'=>$player_a,'player_2'=>$player_b,
-       'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof,'winner'=>$winner);
+       'tournament'=>$tournament, 'time'=>$time, 'bestof'=>$bestof,'winner'=>$winner,'link'=>$link);
     $i++;
 }
 

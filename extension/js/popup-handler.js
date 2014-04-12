@@ -25,19 +25,26 @@ var milli_half_hour = 1800000;
 var milli_hour = 3600000;
 
 var settings = [];
+// user settings
 settings['popout']  = 'false';
 settings['tl_news'] = '0';
-settings['ggrankings'] = "";
-settings['ggrankingscache'] = "0";
-settings['ggmatches'] = "";
-settings['ggmatchescache'] = "0";
-settings['tlnews'] = "";
-settings['tlnewscache'] = "0";
+settings['offset'] = 'false';
+
+var dt;
+var offset = 0;
+
+var api_call = "http://sc2.mpevelerapi.com/";
+// var api_call = "http://localhost/sc2/";
 
 /**
- * gets run at page load and inserts custom JS
+ * runs when button is clicked really
  */
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
+    // time adjust detection
+    dt = new Date();
+    offset = dt.getTimezoneOffset()/60;
+    
+    // functionality
     tabs();
     getSettingsList();
     getStreamList();
@@ -48,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     getGGMatches();
 });
 
+    
 /**
  * getStreamList()
  *
@@ -200,7 +208,7 @@ function getTLNews() {
         setupTLNews(JSON.parse(localStorage.getItem('tlnews')),1);
     }
     else {
-        jQuery.getJSON('http://mpeveler.com/api/TeamLiquidNews/v1', function(data) {
+        jQuery.getJSON(api_call+'TeamLiquidNews/v1', function(data) {
             setupTLNews(data,0);
         });
     }
@@ -255,7 +263,7 @@ function getGGRankings() {
         setupGGRankings(JSON.parse(localStorage.getItem('ggrankings')),1);
     }
     else {
-        jQuery.getJSON('http://mpeveler.com/api/GosuGamersRankings/v1',function(data) {
+        jQuery.getJSON(api_call+'GosuGamersRankings/v1',function(data) {
             setupGGRankings(data,0);
         });
     }
@@ -265,10 +273,11 @@ function setupGGRankings(data,local) {
     var items = data['gosugamers_rankings'];
     for (var key in items) {
         var item = items[key];
-        jQuery('table#trankings').append('<tr class="ggr-row"><td>'+item['rank']+'</td><td style="text-align: left;">'+item['handle']+'</td>'+
+        jQuery('table#trankings').append('<tr class="ggr-row"><td><a href="'+item['link']+'"></a>'+item['rank']+'</td><td style="text-align: left;">'+item['handle']+'</td>'+
             '<td style="text-align:right">('+item['wins']+' - '+item['loses']+' | ' +Math.round((parseInt(item['wins'])/(parseInt(item['wins'])+
             parseInt(item['loses']))*100))+'%)</td><td>'+item['points']+'</td></tr>');
     }
+    setupTooltips('ggr-row');
     if (local == 0) {
         localStorage.setItem('ggrankings',JSON.stringify(data));
         localStorage.setItem('ggrankingscache',jQuery.now());
@@ -290,7 +299,7 @@ function getGGMatches() {
         setupGGMatches(JSON.parse(localStorage.getItem('ggmatches')),1);
     }
     else {
-        jQuery.getJSON('http://localhost/sc2/GosuGamersMatches/v1/',function(data) {
+        jQuery.getJSON(api_call+'GosuGamersMatches/v1/',function(data) {
             setupGGMatches(data,0);
         });
     }
@@ -304,13 +313,15 @@ function setupGGMatches(data,local) {
     for (var key in live) {
         var item = live[key];
         var t = item['tournament']+"|"+item['time']+" GMT";
-        row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+        row = "<tr class='ggm-row' title='"+t+"'><td><a href='"+item['link']+"'></a>"+item['livein']+"</td><td>"+item['player_1']['name']+
+        "</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
         jQuery('table#tupcoming').append(row);
     }
     for (var key in upcoming) {
         var item = upcoming[key];
         var t = item['tournament']+"|"+item['time']+" GMT";
-        row = "<tr class='ggm-row' title='"+t+"'><td>"+item['livein']+"</td><td>"+item['player_1']['name']+"</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
+        row = "<tr class='ggm-row' title='"+t+"'><td><a href='"+item['link']+"'></a>"+item['livein']+"</td><td>"+item['player_1']['name']+
+        "</td><td>vs</td><td>"+item['player_2']['name']+"</td></tr>";
         jQuery('table#tupcoming').append(row);            
     }
     var score = "";
@@ -327,7 +338,7 @@ function setupGGMatches(data,local) {
         }
         var t = item['tournament']+"|"+item['time']+" GMT";
         score = item['player_1']['score']+" : "+item['player_2']['score'];
-        row = "<tr class='ggm-row' title='"+t+"'><td width='10%'>"+score+"</td>"+
+        row = "<tr class='ggm-row' title='"+t+"'><td width='10%'><a href='"+item['link']+"'></a>"+score+"</td>"+
         "<td width='40%' align='center'>"+item['player_1']['name']+"</td><td width='10%'>"+item['w']+"</td>"+
         "<td width='40%' align='center'>"+item['player_2']['name']+"</td></tr>";
         jQuery('table#tresults').append(row);            
@@ -370,8 +381,11 @@ function setupTooltips(class_name) {
         });
         count++;
     }).click(function() {
-        chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
-        window.close();
+        console.log(jQuery(this).find('a').attr('href'));
+        if (jQuery(this).find('a').attr('href') != undefined) {
+            chrome.tabs.create({url:jQuery(this).find('a').attr('href')});
+            window.close();
+        }
         return false;
     });
 }
@@ -485,7 +499,6 @@ function tabs() {
  */
 
 function getNextCacheHalfHour(cache_time) {
-    var dt = new Date();
     var ct = new Date(cache_time);
     var et = ct;
     //var cur = parseInt(dt.getFullYear()+""+parseNumber(dt.getMonth())+""+parseNumber(dt.getDate())+""+parseNumber(dt.getHours())+""+parseNumber(dt.getMinutes()));
@@ -502,7 +515,6 @@ function getNextCacheHalfHour(cache_time) {
 }
 
 function getNextCacheTomorrow(cache_time) {
-    var dt = new Date();
     var ct = new Date(cache_time);
     var et = ct;
     et.setHours(0);
